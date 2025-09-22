@@ -1,3 +1,10 @@
+function getRandomRGB() {
+    const r = Math.floor(Math.random() * 256);
+    const g = Math.floor(Math.random() * 256);
+    const b = Math.floor(Math.random() * 256);
+    return { r, g, b };
+}
+
 function createGrid(size = 16) {
     const gridContainer = document.getElementById('grid-container');
 
@@ -11,8 +18,38 @@ function createGrid(size = 16) {
         const gridSquare = document.createElement('div');
         gridSquare.classList.add('grid-square');
 
+        // Initialize interaction count
+        gridSquare.dataset.interactions = '0';
+
         gridSquare.addEventListener('mouseenter', function() {
-            this.style.backgroundColor = '#333';
+            let interactions = parseInt(this.dataset.interactions);
+
+            if (interactions === 0) {
+                // First interaction: set random color
+                const rgb = getRandomRGB();
+                this.dataset.baseR = rgb.r;
+                this.dataset.baseG = rgb.g;
+                this.dataset.baseB = rgb.b;
+            }
+
+            // Increment interaction count
+            interactions++;
+            this.dataset.interactions = interactions;
+
+            // Calculate darkening factor (10% darker each time)
+            const darkeningFactor = Math.max(0, 1 - (interactions * 0.1));
+
+            // Get base colors
+            const baseR = parseInt(this.dataset.baseR);
+            const baseG = parseInt(this.dataset.baseG);
+            const baseB = parseInt(this.dataset.baseB);
+
+            // Apply darkening
+            const newR = Math.floor(baseR * darkeningFactor);
+            const newG = Math.floor(baseG * darkeningFactor);
+            const newB = Math.floor(baseB * darkeningFactor);
+
+            this.style.backgroundColor = `rgb(${newR}, ${newG}, ${newB})`;
         });
 
         gridContainer.appendChild(gridSquare);
